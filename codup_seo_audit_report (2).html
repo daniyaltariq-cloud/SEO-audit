@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codup — SEO Audit Report · June 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8faf8;
+  --surface2: #f0f5f1;
+  --border: #d4e6d8;
+  --border-bright: #a8ccb0;
+  --green: #16a34a;
+  --green-dim: #15803d;
+  --green-dark: #dcfce7;
+  --green-faint: rgba(22,163,74,0.06);
+  --red: #dc2626;
+  --amber: #d97706;
+  --blue: #2563eb;
+  --text: #0f1f12;
+  --text-2: #2d4a35;
+  --text-3: #6b8f74;
+  --critical: #dc2626;
+  --high: #ea580c;
+  --medium: #fbbf24;
+  --low: #16a34a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background: none;
+  pointer-events:none; z-index:0;
+}
+.wrap { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 28px 80px; }
+
+/* HEADER */
+.hdr { padding:44px 0 36px; border-bottom:1px solid #d4e6d8; margin-bottom:36px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:20px; }
+.hdr-tag { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#16a34a; margin-bottom:8px; }
+.hdr h1 { font-size:42px; font-weight:600; line-height:1.1; letter-spacing:-.02em; color:#0f1f12; }
+.hdr h1 em { font-style:normal; color:#16a34a; }
+.score-box { text-align:center; }
+.score-circle { width:76px; height:76px; border-radius:50%; border:2px solid #16a34a; background:rgba(22,163,74,.08); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 8px; }
+.score-circle .n { font-size:28px; font-weight:600; color:#16a34a; line-height:1; }
+.score-circle .l { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:#16a34a; opacity:.7; }
+.hdr-meta { font-size:11px; color:#6b8f74; text-align:center; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; background:#f8faf8; border:1px solid #d4e6d8; border-radius:10px; padding:5px; margin-bottom:32px; flex-wrap:wrap; }
+.tab { padding:8px 20px; border-radius:7px; font-size:12px; font-weight:500; cursor:pointer; color:#6b8f74; border:none; background:none; letter-spacing:.02em; transition:all .15s; }
+.tab:hover { color:#2d4a35; background:#f0f5f1; }
+.tab.on { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+
+/* SECTIONS */
+.sec { display:none; }
+.sec.show { display:block; }
+
+/* SECTION HEADER */
+.sec-hdr { margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid #d4e6d8; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.sec-hdr h2 { font-size:20px; font-weight:600; color:#0f1f12; }
+.sec-hdr span { font-size:12px; color:#6b8f74; }
+
+/* KPI GRID */
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+.kpi { background:#f8faf8; border:1px solid var(--border); border-radius:10px; padding:20px 16px; position:relative; overflow:hidden; }
+.kpi::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; }
+.kpi.r::after { background:var(--critical); }
+.kpi.a::after { background:var(--medium); }
+.kpi.g::after { background:var(--green); }
+.kpi.b::after { background:var(--blue); }
+.kpi .num { font-size:32px; font-weight:600; line-height:1; margin-bottom:4px; }
+.kpi.r .num { color:var(--critical); }
+.kpi.a .num { color:var(--medium); }
+.kpi.g .num { color:#16a34a; }
+.kpi.b .num { color:var(--blue); }
+.kpi .lbl { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#6b8f74; font-weight:500; }
+.kpi .sub { font-size:11px; color:#6b8f74; margin-top:4px; }
+
+/* CHART CARDS */
+.charts { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+.card { background:#f8faf8; border:1px solid #d4e6d8; border-radius:10px; padding:20px; }
+.card h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:#6b8f74; margin-bottom:16px; }
+
+/* BAR CHART */
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:9px; }
+.bar-lbl { font-size:11px; color:#6b8f74; width:110px; text-align:right; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bar-track { flex:1; height:6px; background:#f0f5f1; border-radius:99px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:99px; }
+.bar-val { font-size:11px; color:#2d4a35; width:36px; font-weight:500; }
+
+/* DONUT */
+.donut-wrap { display:flex; align-items:center; gap:16px; }
+.leg { flex:1; }
+.leg-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.leg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.leg-lbl { font-size:11px; color:#6b8f74; flex:1; }
+.leg-val { font-size:11px; font-weight:500; color:#0f1f12; }
+
+/* ISSUES */
+.issue-list { display:flex; flex-direction:column; gap:12px; }
+.issue { background:#f8faf8; border:1px solid #d4e6d8; border-radius:10px; overflow:hidden; }
+.issue-head { display:flex; align-items:center; gap:14px; padding:18px 20px; cursor:pointer; }
+.issue-head:hover { background:rgba(22,163,74,.04); }
+.badge { padding:3px 10px; border-radius:99px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; flex-shrink:0; }
+.bc { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+.bh { background:#ffedd5; color:#9a3412; border:1px solid #fdba74; }
+.bm { background:#fef9c3; color:#854d0e; border:1px solid #fde047; }
+.bl { background:rgba(74,222,128,.15); color:#16a34a; border:1px solid rgba(74,222,128,.3); }
+.issue-info { flex:1; }
+.issue-title { font-size:15px; font-weight:600; color:#0f1f12; margin-bottom:2px; }
+.issue-sub { font-size:11px; color:#6b8f74; }
+.issue-cnt { font-size:22px; font-weight:600; color:var(--text-2); text-align:right; flex-shrink:0; }
+.issue-cnt small { display:block; font-size:10px; font-weight:400; color:var(--text-3); }
+.chevron { color:#6b8f74; font-size:16px; flex-shrink:0; transition:transform .2s; }
+.issue.open .chevron { transform:rotate(180deg); }
+.issue-body { display:none; border-top:1px solid #d4e6d8; }
+.issue.open .issue-body { display:block; }
+
+/* 3-col analysis */
+.tri { display:grid; grid-template-columns:1fr 1fr 1fr; }
+.tri-col { padding:20px; border-right:1px solid #d4e6d8; }
+.tri-col:last-child { border-right:none; }
+.tri-col h4 { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#6b8f74; margin-bottom:10px; }
+.tri-col p, .tri-col li { font-size:12.5px; color:#2d4a35; line-height:1.65; }
+.tri-col ul { list-style:none; }
+.tri-col ul li { padding-left:14px; position:relative; margin-bottom:4px; }
+.tri-col ul li::before { content:'›'; position:absolute; left:0; color:#16a34a; }
+.col-con p { color:#991b1b; }
+.col-res p { color:#166534; }
+
+/* URL TABLE */
+.url-section { border-top:1px solid #d4e6d8; }
+.url-section-hdr { padding:12px 20px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#f0f5f1; }
+.url-section-hdr:hover { background:rgba(22,163,74,.04); }
+.url-section-hdr span { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:#6b8f74; }
+.url-section-hdr .cnt-badge { background:var(--green-dark); color:#16a34a; font-size:10px; padding:2px 8px; border-radius:99px; border:1px solid var(--green-dim); font-weight:600; }
+.url-table-wrap { display:none; overflow-x:auto; }
+.url-sec-open .url-table-wrap { display:block; }
+table.url-t { width:100%; border-collapse:collapse; font-size:12px; }
+table.url-t th { padding:8px 14px; text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:#6b8f74; border-bottom:1px solid #d4e6d8; white-space:nowrap; }
+table.url-t td { padding:9px 14px; color:#2d4a35; border-bottom:1px solid #e8f0ea; vertical-align:top; }
+table.url-t tr:last-child td { border-bottom:none; }
+table.url-t tr:hover td { background:rgba(22,163,74,.04); }
+table.url-t td.url-cell { font-size:11px; color:var(--text-2); word-break:break-all; max-width:380px; }
+table.url-t td.url-cell a { color:#15803d; text-decoration:none; }
+table.url-t td.url-cell a:hover { color:#16a34a; }
+.status-pill { display:inline-block; padding:1px 7px; border-radius:99px; font-size:10px; font-weight:600; }
+.s404 { background:#fee2e2; color:#991b1b; }
+.s410 { background:#fee2e2; color:#b91c1c; }
+.s502,.s503,.s500,.s5xx { background:#ffedd5; color:#9a3412; }
+.s403 { background:#fef9c3; color:#854d0e; }
+.s301 { background:#dbeafe; color:#1e40af; }
+.s200 { background:#dcfce7; color:#166534; }
+
+/* ROADMAP */
+.road-table { width:100%; border-collapse:collapse; }
+.road-table th { text-align:left; padding:10px 14px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:#6b8f74; border-bottom:1px solid #d4e6d8; white-space:nowrap; }
+.road-table td { padding:12px 14px; font-size:12.5px; color:#2d4a35; border-bottom:1px solid #e8f0ea; vertical-align:middle; }
+.road-table tr:hover td { background:rgba(22,163,74,.04); }
+.road-table td.rk { font-size:20px; font-weight:600; color:#6b8f74; }
+.eff { display:inline-block; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; }
+.el { background:rgba(74,222,128,.12); color:#16a34a; }
+.em { background:#fef9c3; color:#854d0e; }
+.eh { background:#ffedd5; color:#9a3412; }
+.impact-cell { color:#166534; font-size:12px; }
+.time-cell { font-size:11px; color:#6b8f74; white-space:nowrap; }
+
+/* SPRINT BOXES */
+.sprint-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:24px; }
+.sprint-box { background:#f8faf8; border:1px solid #d4e6d8; border-radius:10px; padding:20px; }
+.sprint-box h3 { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:#16a34a; margin-bottom:14px; }
+.sprint-item { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid #d4e6d8; font-size:12.5px; color:#2d4a35; }
+.sprint-item:last-child { border-bottom:none; }
+.sprint-dot { width:6px; height:6px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+
+@media(max-width:900px){
+  .kpi-grid,.charts { grid-template-columns:repeat(2,1fr); }
+  .tri { grid-template-columns:1fr; }
+  .tri-col { border-right:none; border-bottom:1px solid var(--border); }
+  .tri-col:last-child { border-bottom:none; }
+  .sprint-grid { grid-template-columns:1fr; }
+}
+@media(max-width:600px){
+  .wrap { padding:0 14px 60px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; }
+  .hdr h1 { font-size:30px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hdr">
+  <div>
+    <div class="hdr-tag">Ahrefs Site Audit · codup.co · 8 Jun 2026</div>
+    <h1>SEO Audit <em>Report</em></h1>
+  </div>
+  <div class="score-box">
+    <div class="score-circle"><span class="n">77</span><span class="l">Health</span></div>
+    <div class="hdr-meta">3,850 URLs crawled<br>26,454 links found</div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab on" onclick="tab(this,'overview')">Overview</button>
+  <button class="tab" onclick="tab(this,'issues')">Issues & Analysis</button>
+  <button class="tab" onclick="tab(this,'roadmap')">Fix Roadmap</button>
+</nav>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="sec show" id="s-overview">
+  <div class="sec-hdr">
+    <h2>Current Site State</h2>
+    <span>Snapshot from Ahrefs crawl</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi r"><div class="num">801</div><div class="lbl">Errors</div><div class="sub">Need immediate action</div></div>
+    <div class="kpi a"><div class="num">1,971</div><div class="lbl">Warnings</div><div class="sub">Significant SEO impact</div></div>
+    <div class="kpi b"><div class="num">1,041</div><div class="lbl">Notices</div><div class="sub">Low-priority items</div></div>
+    <div class="kpi g"><div class="num">77</div><div class="lbl">Health Score</div><div class="sub">2,371 of 3,087 clean</div></div>
+    <div class="kpi r"><div class="num">3,397</div><div class="lbl">Links → 4xx</div><div class="sub">120 unique broken targets</div></div>
+    <div class="kpi r"><div class="num">3,010</div><div class="lbl">Images No Alt</div><div class="sub">507 affected pages</div></div>
+    <div class="kpi a"><div class="num">20</div><div class="lbl">Bad Canonicals</div><div class="sub">Pointing to non-200 URLs</div></div>
+    <div class="kpi r"><div class="num">35</div><div class="lbl">Internal Broken</div><div class="sub">404 / 410 / 502 pages</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="card">
+      <h3>HTTP Status Distribution</h3>
+      <div class="donut-wrap">
+        <svg width="90" height="90" viewBox="0 0 90 90" style="flex-shrink:0">
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#e5e7eb" stroke-width="14"/>
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#16a34a" stroke-width="14" stroke-dasharray="179.1" transform="rotate(-90 45 45)"/>
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#fbbf24" stroke-width="14" stroke-dasharray="16.6 162.5" stroke-dashoffset="-179.1" transform="rotate(-90 45 45)"/>
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#f87171" stroke-width="14" stroke-dasharray="3 196.2" stroke-dashoffset="1.7" transform="rotate(225 45 45)"/>
+          <text x="45" y="42" text-anchor="middle" fill="#0f1f12" font-size="11" font-weight="600" font-family="Inter,sans-serif">3,087</text>
+          <text x="45" y="53" text-anchor="middle" fill="#6b8f74" font-size="7" font-family="Inter,sans-serif">URLS</text>
+        </svg>
+        <div class="leg">
+          <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div><span class="leg-lbl">2xx Success</span><span class="leg-val">2,791</span></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#d97706"></div><span class="leg-lbl">3xx Redirect</span><span class="leg-val">261</span></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div><span class="leg-lbl">4xx Error</span><span class="leg-val">33</span></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#ea580c"></div><span class="leg-lbl">5xx Error</span><span class="leg-val">2</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Issues by Volume</h3>
+      <div class="bar-row"><div class="bar-lbl">Links → 4xx</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div><div class="bar-val">3,397</div></div>
+      <div class="bar-row"><div class="bar-lbl">Images no alt</div><div class="bar-track"><div class="bar-fill" style="width:89%;background:#ea580c"></div></div><div class="bar-val">3,010</div></div>
+      <div class="bar-row"><div class="bar-lbl">Uncrawled links</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#d97706"></div></div><div class="bar-val">4,910</div></div>
+      <div class="bar-row"><div class="bar-lbl">Blocked robots</div><div class="bar-track"><div class="bar-fill" style="width:51%;background:#16a34a"></div></div><div class="bar-val">1,740</div></div>
+      <div class="bar-row"><div class="bar-lbl">Links → noindex</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:#2563eb"></div></div><div class="bar-val">853</div></div>
+      <div class="bar-row"><div class="bar-lbl">Bad canonicals</div><div class="bar-track"><div class="bar-fill" style="width:0.6%;background:#d97706"></div></div><div class="bar-val">20</div></div>
+      <div class="bar-row"><div class="bar-lbl">Links → 5xx</div><div class="bar-track"><div class="bar-fill" style="width:0.3%;background:#dc2626"></div></div><div class="bar-val">10</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Crawl Coverage</h3>
+      <div class="donut-wrap">
+        <svg width="90" height="90" viewBox="0 0 90 90" style="flex-shrink:0">
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#e5e7eb" stroke-width="14"/>
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#16a34a" stroke-width="14" stroke-dasharray="171.2" transform="rotate(-90 45 45)"/>
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#fbbf24" stroke-width="14" stroke-dasharray="15.9 185.3" stroke-dashoffset="-171.2" transform="rotate(-90 45 45)"/>
+          <circle cx="45" cy="45" r="32" fill="none" stroke="#f87171" stroke-width="14" stroke-dasharray="13 188.2" stroke-dashoffset="-12.8" transform="rotate(219 45 45)"/>
+          <text x="45" y="42" text-anchor="middle" fill="#0f1f12" font-size="11" font-weight="600" font-family="Inter,sans-serif">26,454</text>
+          <text x="45" y="53" text-anchor="middle" fill="#6b8f74" font-size="7" font-family="Inter,sans-serif">LINKS</text>
+        </svg>
+        <div class="leg">
+          <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div><span class="leg-lbl">Crawled</span><span class="leg-val">22,652</span></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#d97706"></div><span class="leg-lbl">Uncrawled</span><span class="leg-val">2,108</span></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div><span class="leg-lbl">Blocked</span><span class="leg-val">1,694</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="card">
+      <h3>Title Tag Length (601 indexable pages)</h3>
+      <div class="bar-row"><div class="bar-lbl">Too short &lt;30</div><div class="bar-track"><div class="bar-fill" style="width:39%;background:#ea580c"></div></div><div class="bar-val">110</div></div>
+      <div class="bar-row"><div class="bar-lbl">Optimal 30–60</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#16a34a"></div></div><div class="bar-val">280</div></div>
+      <div class="bar-row"><div class="bar-lbl">Too long &gt;60</div><div class="bar-track"><div class="bar-fill" style="width:75%;background:#dc2626"></div></div><div class="bar-val">211</div></div>
+      <div style="margin-top:12px;font-size:11px;color:#991b1b">53% of pages have non-optimal title lengths</div>
+    </div>
+    <div class="card">
+      <h3>Uncrawl Reasons (4,910 links)</h3>
+      <div class="bar-row"><div class="bar-lbl">Restricted domain</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#60a5fa"></div></div><div class="bar-val">3,117</div></div>
+      <div class="bar-row"><div class="bar-lbl">Robots.txt</div><div class="bar-track"><div class="bar-fill" style="width:56%;background:#16a34a"></div></div><div class="bar-val">1,740</div></div>
+      <div class="bar-row"><div class="bar-lbl">Crawl speed</div><div class="bar-track"><div class="bar-fill" style="width:1.5%;background:#d97706"></div></div><div class="bar-val">49</div></div>
+      <div class="bar-row"><div class="bar-lbl">Too deep</div><div class="bar-track"><div class="bar-fill" style="width:0.1%;background:#dc2626"></div></div><div class="bar-val">4</div></div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text-3)">LinkedIn alone accounts for 1,147 blocked URLs</div>
+    </div>
+    <div class="card">
+      <h3>Page Depth Distribution</h3>
+      <div class="bar-row"><div class="bar-lbl">Depth 0</div><div class="bar-track"><div class="bar-fill" style="width:26%;background:#16a34a"></div></div><div class="bar-val">569</div></div>
+      <div class="bar-row"><div class="bar-lbl">Depth 1</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#16a34a"></div></div><div class="bar-val">2,153</div></div>
+      <div class="bar-row"><div class="bar-lbl">Depth 2</div><div class="bar-track"><div class="bar-fill" style="width:9%;background:#16a34a"></div></div><div class="bar-val">203</div></div>
+      <div class="bar-row"><div class="bar-lbl">Depth 3</div><div class="bar-track"><div class="bar-fill" style="width:3%;background:#d97706"></div></div><div class="bar-val">64</div></div>
+      <div class="bar-row"><div class="bar-lbl">Depth 7–16+</div><div class="bar-track"><div class="bar-fill" style="width:2%;background:#dc2626"></div></div><div class="bar-val">61</div></div>
+      <div style="margin-top:12px;font-size:11px;color:#991b1b">61 pages at depth 7+ — high crawl-skip risk</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ISSUES ═══════════════ -->
+<div class="sec" id="s-issues">
+  <div class="sec-hdr">
+    <h2>Issues & Full Analysis</h2>
+    <span>Click any issue to expand — includes full URL lists</span>
+  </div>
+
+  <div class="issue-list">
+
+    <!-- ISSUE 1 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bc">Critical</span>
+        <div class="issue-info">
+          <div class="issue-title">Internal Pages Returning 404 / 410 / 502 Errors</div>
+          <div class="issue-sub">HTTP Status · Crawlability · Link Equity Loss</div>
+        </div>
+        <div class="issue-cnt">35<small>pages affected</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>Google hits dead ends when crawling these URLs, wasting crawl budget and losing the link equity previously built up to each page. Any page that once ranked and now returns 404 has fallen out of the index. Backlinks pointing to these URLs pass zero authority anywhere. Users clicking internal links land on error pages, hurting UX and increasing bounce rate.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>For pages that moved — set 301 redirects to the correct URL immediately</li>
+              <li>For 410 pages (hire-wordpress-developers, hire-java-developers) — if intentionally removed, update all internal links pointing to them</li>
+              <li>Fix the 502 server errors: check WP REST API, server config, or plugin conflicts</li>
+              <li>Remove broken image/GIF references from posts (2022 upload paths returning 404)</li>
+              <li>Update all source pages linking to dead URLs</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Recovering pages with backlinks restores link equity and can revive rankings within 2–4 weeks. Fixing 301 redirects preserves SEO value and stops crawl budget drain. Removing broken media references speeds up page rendering. Google will re-crawl and re-index restored content after the next crawl cycle.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>All 35 Broken Internal URLs</span>
+            <span class="cnt-badge">35 URLs</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Status</th><th>URL</th><th>Type</th></tr></thead>
+              <tbody>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/services/white-label-partnership-program/" target="_blank">codup.co/services/white-label-partnership-program/</a></td><td style="color:var(--text-3);font-size:11px">Service page</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/blog/b2b-ecommerce-self-service/" target="_blank">codup.co/blog/b2b-ecommerce-self-service/</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/custom-software-development/in-house-vs-outsourcing-software-development/" target="_blank">codup.co/custom-software-development/in-house-vs-outsourcing-software-development/</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/blog/top-ai-ecommerce-software-tools-retail-2025" target="_blank">codup.co/blog/top-ai-ecommerce-software-tools-retail-2025</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/equipment-as-a-service-b2b-subscription-models" target="_blank">codup.co/equipment-as-a-service-b2b-subscription-models</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/blog/adobe-commerce-b2b-2025-guide" target="_blank">codup.co/blog/adobe-commerce-b2b-2025-guide</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/replatforming-b2b-tech-stack-strategies" target="_blank">codup.co/replatforming-b2b-tech-stack-strategies</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/top-b2b-ecommerce-platforms-2025-comparison" target="_blank">codup.co/top-b2b-ecommerce-platforms-2025-comparison</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/b2b-ecommerce-platform-comparison" target="_blank">codup.co/b2b-ecommerce-platform-comparison</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/shopify-development/top-shopify-agency-experts-2025/" target="_blank">codup.co/shopify-development/top-shopify-agency-experts-2025/</a></td><td style="color:var(--text-3);font-size:11px">Service page</td></tr>
+                <tr><td><span class="status-pill s410">410</span></td><td class="url-cell"><a href="https://codup.co/services/hire-wordpress-developers/" target="_blank">codup.co/services/hire-wordpress-developers/</a></td><td style="color:var(--text-3);font-size:11px">Service page</td></tr>
+                <tr><td><span class="status-pill s410">410</span></td><td class="url-cell"><a href="https://codup.co/services/hire-java-developers/" target="_blank">codup.co/services/hire-java-developers/</a></td><td style="color:var(--text-3);font-size:11px">Service page</td></tr>
+                <tr><td><span class="status-pill s410">410</span></td><td class="url-cell"><a href="https://codup.co/services/hire-ecommerce-developer/" target="_blank">codup.co/services/hire-ecommerce-developer/</a></td><td style="color:var(--text-3);font-size:11px">Service page</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/k-dashboard/" target="_blank">codup.co/portfolio/k-dashboard/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/get-it-printed/" target="_blank">codup.co/portfolio/get-it-printed/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/dyson/" target="_blank">codup.co/portfolio/dyson/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/salesforceben/" target="_blank">codup.co/portfolio/salesforceben/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/royal-caribbean-cruise-lines/" target="_blank">codup.co/portfolio/royal-caribbean-cruise-lines/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/zendex-tools/" target="_blank">codup.co/portfolio/zendex-tools/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/portfolio/cyberizeit/" target="_blank">codup.co/portfolio/cyberizeit/</a></td><td style="color:var(--text-3);font-size:11px">Portfolio</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/shopify-development/build-shopify-theme-extensions-react/" target="_blank">codup.co/shopify-development/build-shopify-theme-extensions-react/</a></td><td style="color:var(--text-3);font-size:11px">Service page</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell"><a href="https://codup.co/custom-software-development/how-to-make-an-app-like-doordash/" target="_blank">codup.co/custom-software-development/how-to-make-an-app-like-doordash/</a></td><td style="color:var(--text-3);font-size:11px">Blog post</td></tr>
+                <tr><td><span class="status-pill s502">502</span></td><td class="url-cell"><a href="https://codup.co/how-to-integrate-a-request-for-quote-functionality-on-your-b2b-store/" target="_blank">codup.co/how-to-integrate-a-request-for-quote-functionality-on-your-b2b-store/</a></td><td style="color:var(--text-3);font-size:11px">Blog post — server error</td></tr>
+                <tr><td><span class="status-pill s502">502</span></td><td class="url-cell"><a href="https://codup.co/blog/author/" target="_blank">codup.co/blog/author/</a></td><td style="color:var(--text-3);font-size:11px">Author archive — server error</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/crpjhjl..gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/jghdsafdgh.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/lets-do-this.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/learn.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/giphy-5.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/giphy-4.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/giphy.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/uploads/2022/10/friends-1.gif</td><td style="color:var(--text-3);font-size:11px">Broken media</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/wp-content/themes/astra/assets/images/starGroup.png</td><td style="color:var(--text-3);font-size:11px">Theme asset</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/blog/introducing-multi-cart-for-b2b-on-shopify-plus/support@extendcommerce.com</td><td style="color:var(--text-3);font-size:11px">Malformed email link</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td class="url-cell">codup.co/blog/how-to-integrate.../wp_link_placeholder</td><td style="color:var(--text-3);font-size:11px">Placeholder not replaced</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 2 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bc">Critical</span>
+        <div class="issue-info">
+          <div class="issue-title">Canonical Tags Pointing to Non-200 URLs</div>
+          <div class="issue-sub">Canonicalization · Duplicate Content · Index Signals</div>
+        </div>
+        <div class="issue-cnt">20<small>pages affected</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>A canonical pointing to a 404 or 301 sends Google a broken instruction. It either ignores the tag entirely — causing duplicate content issues — or follows the chain and lands on an unexpected destination. Either way, link equity isn't consolidating as intended and Google may choose the wrong version to rank. 7 pages point to 404 dead ends, actively destroying their own SEO signals.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>For canonicals → 404: restore the target URL, or update the canonical to a live 200 URL</li>
+              <li>For canonicals → 301: skip the redirect chain — point canonical directly to the final destination URL</li>
+              <li>For www vs non-www discrepancies (www.codup.co vs codup.co) — ensure consistent canonical domain</li>
+              <li>Use Yoast/RankMath canonical field per post; verify with Screaming Frog after updating</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Correct canonicals consolidate link equity to the right URL, improving rankings for those specific pages within 2–4 weeks. Duplicate content ambiguity is resolved. Pages that were competing against their own variants will now have a single clear winner that Google can rank confidently.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>All 20 Pages with Broken Canonicals</span>
+            <span class="cnt-badge">20 URLs</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Source Page</th><th>Canonical Points To</th><th>Canon Status</th></tr></thead>
+              <tbody>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/top-shopify-agency-experts-2025/" target="_blank">blog/top-shopify-agency-experts-2025/</a></td><td class="url-cell" style="color:var(--text-3)">shopify-development/top-shopify-agency-experts-2025/</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/adobe-commerce-b2b-2025/" target="_blank">blog/adobe-commerce-b2b-2025/</a></td><td class="url-cell" style="color:var(--text-3)">blog/adobe-commerce-b2b-2025-guide</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/top-b2b-ecommerce-platforms-2025-comparison/" target="_blank">blog/top-b2b-ecommerce-platforms-2025-comparison/</a></td><td class="url-cell" style="color:var(--text-3)">top-b2b-ecommerce-platforms-2025-comparison</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/self-service-in-b2b-ecommerce/" target="_blank">blog/self-service-in-b2b-ecommerce/</a></td><td class="url-cell" style="color:var(--text-3)">blog/b2b-ecommerce-self-service/</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/b2b-ecommerce-platform-comparison/" target="_blank">blog/b2b-ecommerce-platform-comparison/</a></td><td class="url-cell" style="color:var(--text-3)">b2b-ecommerce-platform-comparison</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/shopify-theme-app-extensions-react/" target="_blank">blog/shopify-theme-app-extensions-react/</a></td><td class="url-cell" style="color:var(--text-3)">shopify-development/build-shopify-theme-extensions-react/</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/game-changing-e-commerce-software-tools-2025/" target="_blank">blog/game-changing-e-commerce-software-tools-2025/</a></td><td class="url-cell" style="color:var(--text-3)">blog/top-ai-ecommerce-software-tools-retail-2025</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/how-to-make-an-app-like-doordash/" target="_blank">blog/how-to-make-an-app-like-doordash/</a></td><td class="url-cell" style="color:var(--text-3)">custom-software-development/how-to-make-an-app-like-doordash/</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/in-house-vs-outsourcing-software-development/" target="_blank">blog/in-house-vs-outsourcing-software-development/</a></td><td class="url-cell" style="color:var(--text-3)">custom-software-development/in-house-vs-outsourcing-software-development/</td><td><span class="status-pill s404">404</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/headless-vs-traditional-b2b-ecommerce-platforms-whats-right-for-you/" target="_blank">blog/headless-vs-traditional-b2b-ecommerce-platforms.../</a></td><td class="url-cell" style="color:var(--text-3)">blog/headless-vs-traditional-b2b-ecommerce</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/b2b-buyer-journey-map/" target="_blank">blog/b2b-buyer-journey-map/</a></td><td class="url-cell" style="color:var(--text-3)">blog/b2b-buyer-journey-map (no trailing slash)</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/replatforming-b2b-tech-stack-strategies/" target="_blank">blog/replatforming-b2b-tech-stack-strategies/</a></td><td class="url-cell" style="color:var(--text-3)">www.codup.co/replatforming-b2b-tech-stack-strategies</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/apartment-complex-wordpress-themes/" target="_blank">blog/apartment-complex-wordpress-themes/</a></td><td class="url-cell" style="color:var(--text-3)">wordpress/apartment-complex-wordpress-themes/</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/streamline-product-development-process-2025/" target="_blank">blog/streamline-product-development-process-2025/</a></td><td class="url-cell" style="color:var(--text-3)">www.codup.co/blog/product-development-process-2025</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/top-9-headless-cms-for-react/" target="_blank">blog/top-9-headless-cms-for-react/</a></td><td class="url-cell" style="color:var(--text-3)">blog/headless-cms-for-react/</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/best-custom-bundling-solutions-for-ecommerce/" target="_blank">blog/best-custom-bundling-solutions-for-ecommerce/</a></td><td class="url-cell" style="color:var(--text-3)">blog/custom-bundling-solutions/</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/equipment-as-a-service-b2b-subscription-models/" target="_blank">blog/equipment-as-a-service-b2b-subscription-models/</a></td><td class="url-cell" style="color:var(--text-3)">www.codup.co/equipment-as-a-service-b2b-subscription-models</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/what-is-concierge-mvp/" target="_blank">blog/what-is-concierge-mvp/</a></td><td class="url-cell" style="color:var(--text-3)">product-development/what-is-concierge-mvp/</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/implementing-composable-commerce-bigcommerce/" target="_blank">blog/implementing-composable-commerce-bigcommerce/</a></td><td class="url-cell" style="color:var(--text-3)">bigcommerce-development/composable-commerce-bigcommerce/</td><td><span class="status-pill s301">301</span></td></tr>
+                <tr><td class="url-cell"><a href="https://codup.co/blog/mid-market-ecommerce-2025-strategies/" target="_blank">blog/mid-market-ecommerce-2025-strategies/</a></td><td class="url-cell" style="color:var(--text-3)">blog/mid-market-ecommerce-2025-strategies (no trailing slash)</td><td><span class="status-pill s301">301</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 3 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bh">High</span>
+        <div class="issue-info">
+          <div class="issue-title">Toxic & Broken External Links (4xx Targets)</div>
+          <div class="issue-sub">Outbound Trust · UX · E-E-A-T Signals</div>
+        </div>
+        <div class="issue-cnt">3,397<small>total refs · 87 unique targets</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>Over 650 links each point to three gambling/casino domains (spinmama.de, spinmama.pl, betnred.pl) — a severe trust red flag for a B2B technology agency. Goodfirms.co returns 403 on 656 links. Staging WPEngine URLs are leaking into production. Google considers outbound link quality as a trust signal — this volume of toxic associations actively hurts Codup's content credibility.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li><strong style="color:#f87171">Urgent:</strong> Remove all links to spinmama.de, spinmama.pl, betnred.pl, boomerangcasinoo.com, gratowins.org, casinocasombie.fr immediately</li>
+              <li>Remove all staging.wpengine.com links — these are dev URLs leaked into production posts</li>
+              <li>For goodfirms.co 403 links — replace href links with plain text attribution or use a different profile URL</li>
+              <li>Check remaining 403s: gartner.com, hbswk.hbs.edu — replace with archived or alternative sources</li>
+              <li>Set up a Broken Link Checker plugin or monthly Ahrefs crawl to catch future issues</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Removing casino/gambling links eliminates a major trust contamination risk. Google's quality assessment of affected blog posts improves. Clean outbound citations strengthen E-E-A-T signals. Blog posts with authoritative, working external links see improved topical authority scores and better crawl rates within 4–8 weeks.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>Top 30 Broken External Targets by Reference Count</span>
+            <span class="cnt-badge">30 of 87</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Status</th><th>References</th><th>Target URL</th><th>Risk</th></tr></thead>
+              <tbody>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#fff">656</td><td class="url-cell">goodfirms.co/company/codup</td><td style="font-size:11px;color:var(--text-3)">Auth-gated</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#f87171">652</td><td class="url-cell" style="color:#991b1b">spinmama.de/ — GAMBLING DOMAIN</td><td style="font-size:11px;color:#f87171">REMOVE NOW</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#f87171">652</td><td class="url-cell" style="color:#991b1b">spinmama.pl/ — GAMBLING DOMAIN</td><td style="font-size:11px;color:#f87171">REMOVE NOW</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#f87171">652</td><td class="url-cell" style="color:#991b1b">betnred.pl/ — GAMBLING DOMAIN</td><td style="font-size:11px;color:#f87171">REMOVE NOW</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#f87171">2</td><td class="url-cell" style="color:#991b1b">boomerangcasinoo.com/ — GAMBLING DOMAIN</td><td style="font-size:11px;color:#f87171">REMOVE NOW</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#f87171">1</td><td class="url-cell" style="color:#991b1b">gratowins.org/ — GAMBLING DOMAIN</td><td style="font-size:11px;color:#f87171">REMOVE NOW</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:#f87171">1</td><td class="url-cell" style="color:#991b1b">casinocasombie.fr/ — GAMBLING DOMAIN</td><td style="font-size:11px;color:#f87171">REMOVE NOW</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td style="font-weight:600;color:#fb923c">5</td><td class="url-cell" style="color:#991b1b">stagingcodup.wpengine.com/wp-content/uploads/... (multiple)</td><td style="font-size:11px;color:#fb923c">Remove staging URLs</td></tr>
+                <tr><td><span class="status-pill s429">429</span></td><td style="font-weight:600;color:var(--text-2)">2</td><td class="url-cell">cdn.getkoala.com/v1/.../sdk.js</td><td style="font-size:11px;color:var(--text-3)">Rate limited CDN</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td style="font-weight:600;color:var(--text-2)">2</td><td class="url-cell">frontend.id-visitors.com/cscripts/ymqLOnyt5r-ffaa6164.js</td><td style="font-size:11px;color:var(--text-3)">Remove script ref</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">2</td><td class="url-cell">app.retention.com/optout</td><td style="font-size:11px;color:var(--text-3)">Auth-gated</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">2</td><td class="url-cell">s3-us-west-2.amazonaws.com/b2bjsstore/b/5Z6PVLHV106R/reb2b.js.gz</td><td style="font-size:11px;color:var(--text-3)">Remove script ref</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">3</td><td class="url-cell">tubefilter.com/2019/05/07/number-hours-video-uploaded...</td><td style="font-size:11px;color:var(--text-3)">Replace source</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">epa.gov/facts-and-figures-about-materials-waste...</td><td style="font-size:11px;color:var(--text-3)">Replace source</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">gartner.com/reviews/market/software-asset-management-tools</td><td style="font-size:11px;color:var(--text-3)">Replace with Gartner link</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">hbswk.hbs.edu/item/better-by-the-bundle</td><td style="font-size:11px;color:var(--text-3)">Find archived version</td></tr>
+                <tr><td><span class="status-pill s406">406</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">whatwpthemeisthat.com/</td><td style="font-size:11px;color:var(--text-3)">Replace or remove</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">fizzle.co/sparkline/backup-wordpress</td><td style="font-size:11px;color:var(--text-3)">Replace source</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">skinnydips.co.uk/product/ultimate-bundle/</td><td style="font-size:11px;color:var(--text-3)">Replace or remove</td></tr>
+                <tr><td><span class="status-pill s404">404</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">ethos3.com/books/jab-jab-jab-right-hook.../</td><td style="font-size:11px;color:var(--text-3)">Find archived version</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">wpprofitbuilder.com/</td><td style="font-size:11px;color:var(--text-3)">Replace or remove</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">snapwrite.ca/</td><td style="font-size:11px;color:var(--text-3)">Replace or remove</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">wpmet.com/plugin/elementskit/</td><td style="font-size:11px;color:var(--text-3)">Find working URL</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">sucuri.net/</td><td style="font-size:11px;color:var(--text-3)">Find working URL</td></tr>
+                <tr><td><span class="status-pill s403">403</span></td><td style="font-weight:600;color:var(--text-2)">1</td><td class="url-cell">etailwest.wbresearch.com/</td><td style="font-size:11px;color:var(--text-3)">Remove if event past</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 4 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bh">High</span>
+        <div class="issue-info">
+          <div class="issue-title">Server Error Links (5xx Targets)</div>
+          <div class="issue-sub">Server Stability Signals · Link Integrity</div>
+        </div>
+        <div class="issue-cnt">10<small>broken links</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>5xx errors signal server failures — Google treats these more seriously than 4xx because they imply instability. Two internal codup.co URLs are returning 502 errors, meaning your own pages are failing. External 5xx links (worldwalking.org, bedford.com, appmaker.xyz) further degrade the quality profile of posts linking to them.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>Fix internal 502s immediately: /how-to-integrate-a-request-for-quote.../ and /blog/author/ — check WP config, REST API, plugin conflicts</li>
+              <li>Remove link to worldwalking.org (503 — appears to be down permanently)</li>
+              <li>Replace bedford.com link (500) with an alternative source</li>
+              <li>Remove shaytoder.com/course (521 — connection refused) and appmaker.xyz (522)</li>
+              <li>Monitor external URLs quarterly using a link health monitoring tool</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Fixing internal 502 errors restores those pages to Google's index and clears server error signals. Removing external 5xx links improves the trust profile of source posts. Google will see the site as more stable and reliable, potentially improving crawl frequency for affected pages.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>All 10 Server Error Links — Source & Target</span>
+            <span class="cnt-badge">10 links</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Status</th><th>Source Page</th><th>Target URL</th></tr></thead>
+              <tbody>
+                <tr><td><span class="status-pill s502">502</span></td><td class="url-cell"><a href="https://codup.co/blog/b2b-sales-guide/" target="_blank">blog/b2b-sales-guide/</a></td><td class="url-cell" style="color:#991b1b">codup.co/how-to-integrate-a-request-for-quote.../  — internal 502</td></tr>
+                <tr><td><span class="status-pill s502">502</span></td><td class="url-cell"><a href="https://codup.co/blog/choosing-a-b2b-ecommerce-platform/" target="_blank">blog/choosing-a-b2b-ecommerce-platform/</a></td><td class="url-cell" style="color:#991b1b">codup.co/how-to-integrate-a-request-for-quote.../  — internal 502</td></tr>
+                <tr><td><span class="status-pill s502">502</span></td><td class="url-cell"><a href="https://codup.co/blog/ai-code-generation-and-what-it-means-for-the-future-of-developers/" target="_blank">blog/ai-code-generation.../</a></td><td class="url-cell" style="color:#991b1b">codup.co/blog/author/  — internal 502</td></tr>
+                <tr><td><span class="status-pill s5xx">503</span></td><td class="url-cell"><a href="https://codup.co/blog/django-vs-laravel/" target="_blank">blog/django-vs-laravel/</a></td><td class="url-cell">worldwalking.org/</td></tr>
+                <tr><td><span class="status-pill s5xx">500</span></td><td class="url-cell"><a href="https://codup.co/blog/8-ways-an-ecommerce-website-can-improve-your-business/" target="_blank">blog/8-ways-an-ecommerce-website.../</a></td><td class="url-cell">bedford.com/</td></tr>
+                <tr><td><span class="status-pill s5xx">521</span></td><td class="url-cell"><a href="https://codup.co/blog/interview-with-shay-toder/" target="_blank">blog/interview-with-shay-toder/</a></td><td class="url-cell">shaytoder.com/course/</td></tr>
+                <tr><td><span class="status-pill s5xx">522</span></td><td class="url-cell"><a href="https://codup.co/blog/8-ways-an-ecommerce-website-can-improve-your-business/" target="_blank">blog/8-ways-an-ecommerce-website.../</a></td><td class="url-cell">blog.appmaker.xyz/social-media-strategies-to-drive-traffic.../</td></tr>
+                <tr><td><span class="status-pill s5xx">522</span></td><td class="url-cell"><a href="https://codup.co/blog/bigcommerce-vs-shopify/" target="_blank">blog/bigcommerce-vs-shopify/</a></td><td class="url-cell">omnistartell.com/blog/50-ways-promote-shopify-store/</td></tr>
+                <tr><td><span class="status-pill s5xx">522</span></td><td class="url-cell"><a href="https://codup.co/blog/customize-woocommerce-product-page/" target="_blank">blog/customize-woocommerce-product-page/</a></td><td class="url-cell">ebusinesspages.com/Codup_eczfs.co</td></tr>
+                <tr><td><span class="status-pill s5xx">522</span></td><td class="url-cell"><a href="https://codup.co/blog/customize-woocommerce-product-page/" target="_blank">blog/customize-woocommerce-product-page/</a></td><td class="url-cell">ebusinesspages.com/</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 5 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bh">High</span>
+        <div class="issue-info">
+          <div class="issue-title">3,010 Images Missing Alt Text</div>
+          <div class="issue-sub">Accessibility · Image SEO · On-page Keyword Signals</div>
+        </div>
+        <div class="issue-cnt">507<small>pages affected</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>Google cannot interpret images without alt text, eliminating all image search traffic potential. Alt text contributes directly to on-page keyword relevance — 3,010 missing instances means substantial keyword signal gaps across 507 pages. This also violates WCAG 2.1 accessibility standards, excluding screen-reader users and creating potential compliance exposure for enterprise clients.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>Use an AI alt text plugin (Alt Text AI, Imagify, or similar) to bulk-generate from WordPress Media Library</li>
+              <li>Prioritise service pages first — they have 20–53 missing alts each and highest business value</li>
+              <li>For portfolio/case study images: write descriptive alts mentioning client and project type</li>
+              <li>For decorative images: use empty alt="" so screen readers skip them correctly</li>
+              <li>Add alt text as a mandatory step in the content publishing SOP going forward</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Properly tagged images become eligible for Google Image Search — a new traffic channel for Codup's visual-heavy service and portfolio pages. On-page keyword coverage improves across 507 pages. WCAG compliance is restored. For a content-heavy site with 3,000+ images, the cumulative SEO lift over 4–8 weeks can be significant, particularly for ecommerce and development queries.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>Top 20 Pages by Missing Alt Count</span>
+            <span class="cnt-badge">507 pages total</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Missing Alts</th><th>Page URL</th><th>Page Type</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:600;color:#f87171">53</td><td class="url-cell"><a href="https://codup.co/services/php-development/" target="_blank">services/php-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#f87171">43</td><td class="url-cell"><a href="https://codup.co/services/staff-augmentation-service/" target="_blank">services/staff-augmentation-service/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#f87171">41</td><td class="url-cell"><a href="https://codup.co/services/laravel-development/" target="_blank">services/laravel-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#fb923c">28</td><td class="url-cell"><a href="https://codup.co/services/business-process-automation/" target="_blank">services/business-process-automation/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#fb923c">27</td><td class="url-cell"><a href="https://codup.co/blog/embed-pdf-files-in-wordpress/" target="_blank">blog/embed-pdf-files-in-wordpress/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+                <tr><td style="font-weight:600;color:#fb923c">27</td><td class="url-cell"><a href="https://codup.co/blog/basic-route-to-become-a-language-independent-developer/" target="_blank">blog/basic-route-to-become-a-language-independent-developer/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+                <tr><td style="font-weight:600;color:#fb923c">25</td><td class="url-cell"><a href="https://codup.co/services/customer-engagement-solutions/" target="_blank">services/customer-engagement-solutions/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">21</td><td class="url-cell"><a href="https://codup.co/services-ecommerce-development-agency/" target="_blank">services-ecommerce-development-agency/</a></td><td style="font-size:11px;color:var(--text-3)">Service hub</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">21</td><td class="url-cell"><a href="https://codup.co/blog/10-best-bigcommerce-b2b-themes/" target="_blank">blog/10-best-bigcommerce-b2b-themes/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">20</td><td class="url-cell"><a href="https://codup.co/b2b-ecommerce-development/" target="_blank">b2b-ecommerce-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service hub</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">19</td><td class="url-cell"><a href="https://codup.co/testimonials/" target="_blank">testimonials/</a></td><td style="font-size:11px;color:var(--text-3)">Testimonials</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">16</td><td class="url-cell"><a href="https://codup.co/blog/bigcommerce-vs-shopify/" target="_blank">blog/bigcommerce-vs-shopify/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">16</td><td class="url-cell"><a href="https://codup.co/services/product-development/" target="_blank">services/product-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">16</td><td class="url-cell"><a href="https://codup.co/blog/b2b-ecommerce-food-and-beverage-industry/" target="_blank">blog/b2b-ecommerce-food-and-beverage-industry/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+                <tr><td style="font-weight:600;color:#fbbf24">14</td><td class="url-cell"><a href="https://codup.co/services/dealer-customer-commerce-platforms/" target="_blank">services/dealer-customer-commerce-platforms/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#a3e635">13</td><td class="url-cell"><a href="https://codup.co/services/wordpress-development/" target="_blank">services/wordpress-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#a3e635">12</td><td class="url-cell"><a href="https://codup.co/blog/best-shopify-referral-software/" target="_blank">blog/best-shopify-referral-software/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+                <tr><td style="font-weight:600;color:#a3e635">12</td><td class="url-cell"><a href="https://codup.co/services/woocommerce-development/" target="_blank">services/woocommerce-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#a3e635">11</td><td class="url-cell"><a href="https://codup.co/services/shopify-development/" target="_blank">services/shopify-development/</a></td><td style="font-size:11px;color:var(--text-3)">Service page</td></tr>
+                <tr><td style="font-weight:600;color:#a3e635">10</td><td class="url-cell"><a href="https://codup.co/blog/woocommerce-vs-shopify/" target="_blank">blog/woocommerce-vs-shopify/</a></td><td style="font-size:11px;color:var(--text-3)">Blog post</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 6 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bm">Medium</span>
+        <div class="issue-info">
+          <div class="issue-title">321 Pages with Non-Optimal Title Tag Lengths</div>
+          <div class="issue-sub">On-page SEO · SERP CTR · Keyword Coverage</div>
+        </div>
+        <div class="issue-cnt">321<small>of 601 indexable pages</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>110 pages have titles under 30 chars — likely missing primary keywords entirely. 211 pages exceed 60 chars and get truncated in SERPs, hiding the message and reducing CTR. A truncated title like "Custom Middleware For System Integrations - The Essential Layer For Se..." fails to communicate value. Short titles like "Careers - Codup" (15 chars) miss keyword ranking opportunities completely.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>Target 50–60 characters for all titles — use the format: [Primary Keyword] — [Differentiator] | Codup</li>
+              <li>Short titles priority: add primary keyword before brand name ("WordPress Development Agency | Codup" not "Careers - Codup")</li>
+              <li>Long titles: move the most important keyword phrase to first 50 chars, trim filler words</li>
+              <li>Update via Yoast/RankMath SEO title field — never edit the post/page title directly</li>
+              <li>Use SERP preview tool in Yoast to visually confirm before publishing</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Well-crafted titles (50–60 chars) with front-loaded keywords improve CTR by 5–15% on competitive queries. Better CTR signals to Google that users prefer this result, which can trigger ranking improvements. Keyword-rich short titles help under-optimised pages finally compete for their target terms.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>Sample — Short Titles (&lt;30 chars)</span>
+            <span class="cnt-badge">110 pages</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Chars</th><th>Current Title</th><th>URL</th></tr></thead>
+              <tbody>
+                <tr><td style="color:#dc2626;font-weight:600">15</td><td style="color:var(--text-2)">Careers - Codup</td><td class="url-cell"><a href="https://codup.co/careers/" target="_blank">careers/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">16</td><td style="color:var(--text-2)">About Us - Codup</td><td class="url-cell"><a href="https://codup.co/about-us/" target="_blank">about-us/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">17</td><td style="color:var(--text-2)">Meet Asim - Codup</td><td class="url-cell"><a href="https://codup.co/events/meet-asim/" target="_blank">events/meet-asim/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">18</td><td style="color:var(--text-2)">Contact Us - Codup</td><td class="url-cell"><a href="https://codup.co/contact-us/" target="_blank">contact-us/</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">21</td><td style="color:var(--text-2)">life at codup - Codup</td><td class="url-cell"><a href="https://codup.co/life-at-codup/" target="_blank">life-at-codup/</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">22</td><td style="color:var(--text-2)">Privacy Policy - Codup</td><td class="url-cell"><a href="https://codup.co/privacy-policy/" target="_blank">privacy-policy/</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">26</td><td style="color:var(--text-2)">Portfolios Archive - Codup</td><td class="url-cell"><a href="https://codup.co/portfolio/" target="_blank">portfolio/</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">26</td><td style="color:var(--text-2)">Terms & Conditions - Codup</td><td class="url-cell"><a href="https://codup.co/terms-and-conditions/" target="_blank">terms-and-conditions/</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="url-section" style="border-top:1px solid var(--border)">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>Sample — Long Titles (&gt;60 chars)</span>
+            <span class="cnt-badge">211 pages</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Chars</th><th>Current Title</th><th>URL</th></tr></thead>
+              <tbody>
+                <tr><td style="color:#dc2626;font-weight:600">102</td><td style="color:var(--text-2)">Custom Middleware For System Integrations - The Essential Layer For Seamless...</td><td class="url-cell"><a href="https://codup.co/blog/custom-middleware-for-system-integrations/" target="_blank">blog/custom-middleware-for-system-integrations/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">85</td><td style="color:var(--text-2)">Shopify Plus vs BigCommerce Enterprise: Choosing the Right Platform for...</td><td class="url-cell"><a href="https://codup.co/blog/shopify-plus-vs-bigcommerce-enterprise/" target="_blank">blog/shopify-plus-vs-bigcommerce-enterprise/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">78</td><td style="color:var(--text-2)">Complex Product Configurator for B2B: A Practical Implementation Guide</td><td class="url-cell"><a href="https://codup.co/blog/complex-product-configurator/" target="_blank">blog/complex-product-configurator/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">72</td><td style="color:var(--text-2)">Insights & Strategies on B2B eCommerce, Tech, and Digital Growth - Codup</td><td class="url-cell"><a href="https://codup.co/blog/" target="_blank">blog/</a></td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">72</td><td style="color:var(--text-2)">WordPress Development Services - Top-Rated on Clutch - 3500+ WP Projects</td><td class="url-cell"><a href="https://codup.co/services/wordpress-development/" target="_blank">services/wordpress-development/</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">64</td><td style="color:var(--text-2)">Full Stack Development: A Short Guide to Get You Started - Codup</td><td class="url-cell"><a href="https://codup.co/blog/full-stack-development-a-short-guide-to-get-you-started/" target="_blank">blog/full-stack-development.../</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">62</td><td style="color:var(--text-2)">Where is PHP.ini In WordPress – How To Locate and Edit PHP.ini</td><td class="url-cell"><a href="https://codup.co/blog/where-is-php-ini-in-wordpress-how-to-locate-and-edit-php-ini/" target="_blank">blog/where-is-php-ini.../</a></td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">61</td><td style="color:var(--text-2)">Unlocking Revenue with B2B eCommerce Strategy in 2025 | Codup</td><td class="url-cell"><a href="https://codup.co/blog/b2b-ecommerce-for-manufacturers-distributors/" target="_blank">blog/b2b-ecommerce-for-manufacturers-distributors/</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 7 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bm">Medium</span>
+        <div class="issue-info">
+          <div class="issue-title">21 Pages/Archives Buried at Depth 7–16 Clicks</div>
+          <div class="issue-sub">Site Architecture · Crawl Budget · Internal Linking</div>
+        </div>
+        <div class="issue-cnt">21<small>deep URLs</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>Blog pagination pages reaching depth 16 means Google must follow 16 consecutive links to reach content on those pages. Google deprioritises URLs beyond depth 3–4, meaning posts on these deep archive pages may never be crawled. The real risk is that recent, high-quality blog posts are accessible only through deep pagination — invisible to crawlers. Only one actual content page (shopify-theme-app-extensions-react) sits at depth 10 — the rest are pagination archives.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>Add a "Related Posts" or "Popular Articles" section to every blog post to create cross-links that bypass pagination depth</li>
+              <li>Add a HTML sitemap page that directly lists all blog post URLs — exposes them at depth 1 from the sitemap</li>
+              <li>Increase posts per page on blog archive (show 20–30 posts per page instead of 10) to reduce pagination count</li>
+              <li>Ensure the XML sitemap includes all blog posts with their direct URLs</li>
+              <li>Add internal links from high-authority service pages to specific relevant blog posts</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Reducing effective click depth of blog posts from 7–16 to 2–3 puts them in Google's regular crawl cycle. Content that was previously invisible to crawlers gets indexed. Posts that already have backlinks but weren't crawled will start gaining rankings. Blog PageRank distribution improves across all posts rather than concentrating only on recently-linked ones.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>All 21 Deep Pages</span>
+            <span class="cnt-badge">21 URLs</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>Depth</th><th>URL</th><th>Type</th></tr></thead>
+              <tbody>
+                <tr><td style="color:#dc2626;font-weight:600">16</td><td class="url-cell"><a href="https://codup.co/blog/page/17/" target="_blank">blog/page/17/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">16</td><td class="url-cell"><a href="https://codup.co/blog/page/25/" target="_blank">blog/page/25/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">15</td><td class="url-cell"><a href="https://codup.co/blog/page/26/" target="_blank">blog/page/26/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">15</td><td class="url-cell"><a href="https://codup.co/blog/page/16/" target="_blank">blog/page/16/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">14</td><td class="url-cell"><a href="https://codup.co/blog/page/27/" target="_blank">blog/page/27/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#dc2626;font-weight:600">14</td><td class="url-cell"><a href="https://codup.co/blog/page/15/" target="_blank">blog/page/15/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">13</td><td class="url-cell"><a href="https://codup.co/blog/page/14/" target="_blank">blog/page/14/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">13</td><td class="url-cell"><a href="https://codup.co/blog/page/28/" target="_blank">blog/page/28/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">12</td><td class="url-cell"><a href="https://codup.co/blog/page/29/" target="_blank">blog/page/29/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#ea580c;font-weight:600">12</td><td class="url-cell"><a href="https://codup.co/blog/page/13/" target="_blank">blog/page/13/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#d97706;font-weight:600">11</td><td class="url-cell"><a href="https://codup.co/blog/page/12/" target="_blank">blog/page/12/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#d97706;font-weight:600">11</td><td class="url-cell"><a href="https://codup.co/blog/page/30/" target="_blank">blog/page/30/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#d97706;font-weight:600">10</td><td class="url-cell"><a href="https://codup.co/blog/page/31/" target="_blank">blog/page/31/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#d97706;font-weight:600">10</td><td class="url-cell"><a href="https://codup.co/blog/page/11/" target="_blank">blog/page/11/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#d97706;font-weight:600">10</td><td class="url-cell"><a href="https://codup.co/blog/shopify-theme-app-extensions-react/" target="_blank">blog/shopify-theme-app-extensions-react/</a></td><td style="font-size:11px;color:#854d0e">Content page — needs internal links</td></tr>
+                <tr><td style="color:#16a34a;font-weight:600">9</td><td class="url-cell"><a href="https://codup.co/blog/page/32/" target="_blank">blog/page/32/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#16a34a;font-weight:600">9</td><td class="url-cell"><a href="https://codup.co/blog/page/10/" target="_blank">blog/page/10/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#16a34a;font-weight:600">8</td><td class="url-cell"><a href="https://codup.co/blog/page/9/" target="_blank">blog/page/9/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#16a34a;font-weight:600">8</td><td class="url-cell"><a href="https://codup.co/blog/page/33/" target="_blank">blog/page/33/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#16a34a;font-weight:600">7</td><td class="url-cell"><a href="https://codup.co/blog/page/34/" target="_blank">blog/page/34/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+                <tr><td style="color:#16a34a;font-weight:600">7</td><td class="url-cell"><a href="https://codup.co/blog/page/8/" target="_blank">blog/page/8/</a></td><td style="font-size:11px;color:var(--text-3)">Pagination archive</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUE 8 -->
+    <div class="issue" onclick="tog(this)">
+      <div class="issue-head">
+        <span class="badge bm">Medium</span>
+        <div class="issue-info">
+          <div class="issue-title">853 Links Pointing to Noindex Pages</div>
+          <div class="issue-sub">Link Equity · Internal Linking Policy</div>
+        </div>
+        <div class="issue-cnt">853<small>wasted link passes</small></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="issue-body">
+        <div class="tri">
+          <div class="tri-col col-con">
+            <h4>Consequences</h4>
+            <p>Links to noindex pages pass PageRank to URLs that Google will never rank — a direct waste of link equity. The top target (goodfirms.co returning 403) accounts for a large share. HubSpot CDN CSS files showing as noindex are expected and harmless. But any internal codup.co pages mistakenly set to noindex while receiving internal links need immediate review.</p>
+          </div>
+          <div class="tri-col">
+            <h4>How to Fix</h4>
+            <ul>
+              <li>Filter the list to find codup.co targets set to noindex — check if the noindex is intentional</li>
+              <li>For goodfirms.co 403 links (hundreds of refs) — replace or remove; these send equity nowhere</li>
+              <li>HubSpot/CDN asset URLs with noindex — acceptable, no action needed</li>
+              <li>For any internal page mistakenly noindexed — remove the noindex directive in Yoast/robots meta</li>
+              <li>Audit event.codup.co subdomains — these appear to have noindex set on HubSpot event pages</li>
+            </ul>
+          </div>
+          <div class="tri-col col-res">
+            <h4>Expected Results</h4>
+            <p>Redirecting link equity from noindex targets to indexable pages improves PageRank distribution. Removing hundreds of goodfirms.co links that go nowhere improves the overall quality signal of pages containing them. Internal pages that were incorrectly noindexed may start ranking once the directive is removed.</p>
+          </div>
+        </div>
+        <div class="url-section">
+          <div class="url-section-hdr" onclick="togUrl(this)">
+            <span>Top 15 Noindex Targets by Reference Count</span>
+            <span class="cnt-badge">15 of many</span>
+          </div>
+          <div class="url-table-wrap">
+            <table class="url-t">
+              <thead><tr><th>References</th><th>Target URL</th><th>Note</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:600;color:#f87171">many</td><td class="url-cell">goodfirms.co/company/codup (returns 403)</td><td style="font-size:11px;color:#991b1b">Replace or remove all links</td></tr>
+                <tr><td style="font-weight:600;color:var(--text-2)">~</td><td class="url-cell">48752163.fs1.hubspotusercontent-na1.net/...index-DSytT9In.css</td><td style="font-size:11px;color:var(--text-3)">CDN asset — acceptable</td></tr>
+                <tr><td style="font-weight:600;color:var(--text-2)">~</td><td class="url-cell">event.codup.co/lighting-configurator-webinar-cpq-workflows</td><td style="font-size:11px;color:#fbbf24">Review — codup subdomain</td></tr>
+                <tr><td style="font-weight:600;color:var(--text-2)">~</td><td class="url-cell">event.codup.co/* (HubSpot event pages)</td><td style="font-size:11px;color:var(--text-3)">Noindex expected for event landing pages</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ ROADMAP ═══════════════ -->
+<div class="sec" id="s-roadmap">
+  <div class="sec-hdr">
+    <h2>Fix Roadmap</h2>
+    <span>Ranked by severity × effort × expected impact</span>
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <h3>Prioritised Action Table</h3>
+    <div style="overflow-x:auto">
+    <table class="road-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Issue</th><th>Severity</th><th>Affected</th><th>Effort</th><th>Expected Impact</th><th>Timeline</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="rk">1</td><td>Fix internal 404/410/502 pages — set 301 redirects or restore content</td><td><span class="badge bc">Critical</span></td><td>35 pages</td><td><span class="eff em">Medium</span></td><td class="impact-cell">Restores crawlability, recovers lost link equity, revives rankings</td><td class="time-cell">Week 1</td></tr>
+        <tr><td class="rk">2</td><td>Fix broken canonical tags (update to live 200 URLs)</td><td><span class="badge bc">Critical</span></td><td>20 pages</td><td><span class="eff el">Low</span></td><td class="impact-cell">Eliminates duplicate content signals, consolidates equity to correct URLs</td><td class="time-cell">Week 1</td></tr>
+        <tr><td class="rk">3</td><td>Remove all casino/gambling domain links immediately</td><td><span class="badge bh">High</span></td><td>7 domains</td><td><span class="eff el">Low</span></td><td class="impact-cell">Eliminates severe trust contamination risk across affected blog posts</td><td class="time-cell">Week 1</td></tr>
+        <tr><td class="rk">4</td><td>Fix internal 502 server errors + remove external 5xx links</td><td><span class="badge bh">High</span></td><td>10 links</td><td><span class="eff el">Low</span></td><td class="impact-cell">Restores failed pages, removes server instability signals</td><td class="time-cell">Week 1</td></tr>
+        <tr><td class="rk">5</td><td>Remove staging.wpengine.com leaked URLs from posts</td><td><span class="badge bh">High</span></td><td>5+ posts</td><td><span class="eff el">Low</span></td><td class="impact-cell">Removes dev environment exposure, cleans up broken image refs</td><td class="time-cell">Week 1</td></tr>
+        <tr><td class="rk">6</td><td>Optimise title tags for 321 pages (50–60 char target)</td><td><span class="badge bm">Medium</span></td><td>321 pages</td><td><span class="eff em">Medium</span></td><td class="impact-cell">5–15% CTR improvement on affected SERP listings</td><td class="time-cell">Week 2–3</td></tr>
+        <tr><td class="rk">7</td><td>Add alt text to 3,010 images across 507 pages</td><td><span class="badge bh">High</span></td><td>507 pages</td><td><span class="eff eh">High</span></td><td class="impact-cell">Opens image search channel, improves keyword coverage on all pages</td><td class="time-cell">Week 2–4</td></tr>
+        <tr><td class="rk">8</td><td>Fix blog pagination depth — increase posts per page + add HTML sitemap</td><td><span class="badge bm">Medium</span></td><td>21 deep URLs</td><td><span class="eff em">Medium</span></td><td class="impact-cell">Exposes deep blog content to regular crawl cycles</td><td class="time-cell">Week 3–4</td></tr>
+        <tr><td class="rk">9</td><td>Audit 853 links to noindex pages — remove goodfirms.co links</td><td><span class="badge bm">Medium</span></td><td>853 links</td><td><span class="eff em">Medium</span></td><td class="impact-cell">Stops wasting PageRank on uncrawlable destinations</td><td class="time-cell">Week 4–5</td></tr>
+        <tr><td class="rk">10</td><td>Verify robots.txt — check HubSpot CTAs, no accidental codup.co blocks</td><td><span class="badge bm">Medium</span></td><td>1,740 links</td><td><span class="eff el">Low</span></td><td class="impact-cell">Confirms intentional blocks, protects conversion paths</td><td class="time-cell">Week 2</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-box">
+      <h3>Sprint 1 — Week 1 (Immediate)</h3>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#dc2626"></div>Restore / 301 redirect 35 broken internal pages</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#dc2626"></div>Fix 20 canonical tags pointing to 404 or 301 URLs</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#dc2626"></div>Remove all 7 casino/gambling domain links from posts</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#ea580c"></div>Fix internal 502 server errors on /how-to-integrate-rfq/ and /blog/author/</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#ea580c"></div>Remove all stagingcodup.wpengine.com URLs from production</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#d97706"></div>Audit robots.txt — verify HubSpot CTAs not accidentally blocked</div>
+    </div>
+    <div class="sprint-box">
+      <h3>Sprint 2 — Weeks 2–4 (Short-term)</h3>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#d97706"></div>Optimise title tags across 321 non-optimal pages</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#ea580c"></div>Bulk-add alt text to 3,010 images using AI alt text tool</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#d97706"></div>Replace / remove remaining broken external 4xx links (goodfirms, orphaned sources)</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#d97706"></div>Increase blog posts per page + add HTML sitemap to address depth issue</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#16a34a"></div>Audit 853 noindex-target links — remove bulk goodfirms.co references</div>
+      <div class="sprint-item"><div class="sprint-dot" style="background:#16a34a"></div>Set up quarterly Ahrefs re-crawl schedule and broken link monitoring</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+function tab(el, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('show'));
+  el.classList.add('on');
+  document.getElementById('s-' + id).classList.add('show');
+}
+function tog(el) {
+  el.classList.toggle('open');
+}
+function togUrl(el) {
+  el.parentElement.classList.toggle('url-sec-open');
+  event.stopPropagation();
+}
+</script>
+</body>
+</html>
